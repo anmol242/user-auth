@@ -8,6 +8,14 @@ export async function connect() {
     connection.on("connected", () => {
       console.log("Database connected successfully 🚀");
     });
+
+    connection.on("error", (err) => {
+      console.log(
+        "Mongo DB connection error. Please make sure it is running :🤯",
+        err
+      );
+      process.exit();
+    });
   } catch (error) {
     console.log("Failed to connect to Database 🧨", error);
   }

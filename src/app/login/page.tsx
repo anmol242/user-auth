@@ -1,7 +1,87 @@
+"use client";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
+
 export default function LoginPage() {
+  const router = useRouter();
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const onLogin = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/users/login", user);
+
+      console.log("Login successful", response.data);
+      toast.success("Login successful");
+
+      setTimeout(() => {
+        router.push("/profile");
+      }, 2000);
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user.email.length && user.password.length) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
+
   return (
-    <div className="flex">
-      <h1 className="text-center text-white text-2xl">Login Page</h1>
+    <div className="flex justify-center flex-col items-center min-h-screen py-2">
+      <Toaster position="bottom-center" />
+      <h1>{loading ? "Processing" : "Login"}</h1>
+      <hr />
+      <label htmlFor="email">email</label>
+      <input
+        className="p-1 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400 text-black"
+        id="email"
+        type="text"
+        value={user.email}
+        onChange={(e) =>
+          setUser({
+            ...user,
+            email: e.target.value,
+          })
+        }
+        placeholder="email"
+      />
+      <label htmlFor="password">password</label>
+      <input
+        className="p-1 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400 text-black"
+        id="password"
+        type="password"
+        value={user.password}
+        onChange={(e) =>
+          setUser({
+            ...user,
+            password: e.target.value,
+          })
+        }
+        placeholder="password"
+      />
+      <button
+        className="p-2 mt-4 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
+        onClick={onLogin}
+      >
+        Login Here
+      </button>
+      <Link href="/signup">Visit SignUp Here</Link>
     </div>
   );
 }
